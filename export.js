@@ -1,16 +1,11 @@
-const phantom = require('phantom');
+const puppeteer = require('puppeteer');
 
-(async function() {
-  const instance = await phantom.create();
-  const page = await instance.createPage();
-  await page.on('onResourceRequested', function(requestData) {
-    console.info('Requesting', requestData.url);
-  });
+(async () => {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.goto('https://r.jiangyixin.top', {waitUntil: 'networkidle2'});
+  await page.pdf({path: './resume.pdf', format: 'A4', 'printBackground': true});
 
-  const status = await page.open('./index.html');
-  page.property('viewportSize',{width: 1200, height: 600});
-  const content = await page.property('content');
-  const result = await page.render('./resume.pdf');
-  console.log(result)
-  await instance.exit();
+  await browser.close();
+  console.log('pdf export success')
 })();
